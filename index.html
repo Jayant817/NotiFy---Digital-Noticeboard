@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Digital Notice Board</title>
+  <head>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Mozilla+Headline:wght@700&display=swap" rel="stylesheet">
+</head>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+    header {
+      background: #033543;
+      color: white;
+      padding: 0.5rem;
+      text-align: center;
+      font: bold 1 rem 'Mozilla Headline', sans-serif;
+      border-radius: 10px;
+      border: 10px solid #085b92;
+      box-shadow: 0 2px 4px rgba(181, 171, 171, 0.2);
+      margin-bottom: 0.5rem;
+    }
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background: #34495e;
+      padding: 0.5rem 0;
+    }
+    nav button {
+  background: linear-gradient(90deg, #168282 0%, #0ef4f4 100%);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 24px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0 0.3rem;
+  box-shadow: 0 2px 8px rgba(22,130,130,0.08);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.3s;
+}
+nav button:hover, nav button:focus {
+  background: linear-gradient(90deg, #0ef4f4 0%, #168282 100%);
+  color: #033543;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 16px rgba(22,130,130,0.18);
+  outline: none;
+}
+    
+    section {
+      display: none;
+      padding: 1rem;
+      background: white;
+      margin: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    section.active {
+      display: block;
+    }
+    .post {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border-left: 4px solid #3498db;
+      background: #ecf0f1;
+      border-radius: 4px;
+    }
+    .admin-panel {
+      text-align: right;
+      margin: 1rem;
+    }
+    .admin-panel button {
+      background: #13783d;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #postForm {
+      display: none;
+      margin: 1rem;
+      background: #dff9fb;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+    }
+    .edit-btn, .delete-btn, .save-btn, .cancel-btn {
+  background: #2980b9;
+  color: #fff;
+  border: none;
+  margin-left: 0.5rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.delete-btn { background: #e74c3c; }
+.save-btn { background: #27ae60; }
+.cancel-btn { background: #7f8c8d; }
+.edit-btn:hover, .delete-btn:hover, .save-btn:hover, .cancel-btn:hover {
+  opacity: 0.85;
+}
+.post-actions {
+  margin-top: 0.5rem;
+  text-align: right;
+}
+.notify-logo {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  background: transparent;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1><img src="images/Notify.png" alt="Notify Logo" class="notify-logo">NotiFy: - Digital Notice Board</h1>
+    <p><marquee behavior="scroll" direction="left">Stay updated with local news, events, and services</marquee></p>
+  </header>
+  <nav>
+    <button onclick="showSection('announcements')">Announcements</button>
+    <button onclick="showSection('events')">Events</button>
+    <button onclick="showSection('market')">Buy/Sell/Rent</button>
+    <button onclick="showSection('contacts')">Important Contacts</button>
+  </nav>
+
+  <div class="admin-panel">
+    <button id="adminLoginBtn" onclick="goToAdminLogin()">Admin Login</button>
+  <button id="addPostBtn" style="display:none;" onclick="openPostForm()">+ New Post (Admin)</button>
+  <button id="logoutBtn" style="display:none;" onclick="logoutAdmin()">Logout</button>
+  </div>
+
+  <form id="postForm" onsubmit="addPost(event)">
+    <label>Section:</label>
+    <select id="section">
+      <option value="announcements">Announcements</option>
+      <option value="events">Events</option>
+      <option value="market">Buy/Sell/Rent</option>
+    </select>
+    <label>Title:</label>
+    <input type="text" id="title" required>
+    <label>Content:</label>
+    <textarea id="content" required></textarea>
+    <button type="submit">Post</button>
+  </form>
+
+  <section id="announcements" class="active">
+    <h2>Announcements <img src="images/announcement.jpg" alt=""></h2>
+  
+    <div id="announcementsPosts"></div>
+  </section>
+
+  <section id="events">
+   <h2 style="color:#168282; font-family:'Mozilla Headline','Poppins',sans-serif; text-align:center; margin-bottom:1.5rem;">
+    <span style="vertical-align:middle;">🎉</span> Local Events
+  </h2>
+  <div id="eventsPosts"></div>
+  <div style="text-align:center; margin-top:2rem;">
+    <span style="font-size:1.1rem; color:#168282; font-family:'Poppins',sans-serif;">
+      Don't miss out on the latest happenings, festivals, and gatherings in your community!
+    </span>
+    <br>
+    <span style="font-size:0.95rem; color:#34495e;">
+      <strong>Tip:</strong> Click on an event to see more details or RSVP.
+    </span>
+  </div>
+  </section>
+
+  <section id="market">
+     <h2 style="color:#d35400; font-family:'Poppins',sans-serif; font-size:2rem; text-align:center; letter-spacing:2px; margin-bottom:1.5rem;">
+    <span style="vertical-align:middle;">💸</span> Buy / Sell / Rent <span style="vertical-align:middle;">🏠</span>
+  </h2>
+  <div id="marketPosts"></div>
+  <div style="text-align:center; margin-top:2rem;">
+    <span style="font-size:1.1rem; color:#b9770e; font-family:'Poppins',sans-serif;">
+      Find the best deals, hottest properties, and exclusive offers in your area!
+    </span>
+    <br>
+    <span style="font-size:0.95rem; color:#d35400;">
+      <strong>Tip:</strong> Listings with <span style="color:#27ae60;">green</span> tags are verified by our team.
+    </span>
+  </div>
+  </section>
+
+  <section id="contacts">
+    <h2 style="color:#168282; font-family:'Mozilla Headline','Poppins',sans-serif; text-align:center; margin-bottom:1rem;">
+    <span style="vertical-align:middle;">📞</span> Important Contacts
+  </h2>
+  <ul style="list-style:none; padding:0; margin:0;">
+    <li style="margin-bottom:1rem; background:#fff; border-radius:8px; box-shadow:0 1px 4px rgba(22,130,130,0.06); padding:0.8rem 1rem; display:flex; align-items:center;">
+      <span style="font-size:1.3rem; color:#168282; margin-right:0.7rem;">🏢</span>
+      <span style="font-weight:600; color:#033543;">Society Office:</span>
+      <span style="margin-left:auto; color:#13783d;">+91-9876543210</span>
+    </li>
+    <li style="margin-bottom:1rem; background:#fff; border-radius:8px; box-shadow:0 1px 4px rgba(22,130,130,0.06); padding:0.8rem 1rem; display:flex; align-items:center;">
+      <span style="font-size:1.3rem; color:#168282; margin-right:0.7rem;">🛡️</span>
+      <span style="font-weight:600; color:#033543;">Security Desk:</span>
+      <span style="margin-left:auto; color:#13783d;">+91-9876501234</span>
+    </li>
+    <li style="background:#fff; border-radius:8px; box-shadow:0 1px 4px rgba(22,130,130,0.06); padding:0.8rem 1rem; display:flex; align-items:center;">
+      <span style="font-size:1.3rem; color:#168282; margin-right:0.7rem;">🛠️</span>
+      <span style="font-weight:600; color:#033543;">Maintenance Helpline:</span>
+      <span style="margin-left:auto; color:#13783d;">+91-9811122233</span>
+    </li>
+  </ul>
+  </section>
+
+  <!-- Discover What's in Your Area Section -->
+<div id="discover-area" style="margin:2rem auto; max-width:900px; background:#033543; border-radius:24px; box-shadow:0 4px 16px rgba(0,0,0,0.10); padding:2rem;">
+  <h2 style="text-align:center; color:#0ef4f4; font-family:'Mozilla Headline','Poppins',sans-serif; margin-bottom:2rem;">
+    Discover What's in Your Area
+  </h2>
+  <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center;">
+    <!-- Event 1 -->
+    <div style="flex:1 1 250px; min-width:250px; max-width:320px; background:#f8fafc; border-radius:16px; box-shadow:0 2px 8px rgba(22,130,130,0.08); padding:1.2rem; display:flex; flex-direction:column; align-items:center;">
+      <img src="images/music festival 3 (1).jpeg" alt="Music Festival" style="width:300px; height:150px;  object-fit:cover; margin-bottom:1rem; border:3px solid #168282;">
+      <strong style="font-size:1.15rem; color:#168282; margin-bottom:0.5rem;">Music Festival at RDC, Raj Nagar</strong>
+      <p style="text-align:center; color:#333; margin-bottom:0.5rem;">Enjoy Musical Night from one and only Shreya Ghoshal!</p>
+      <div style="font-size:0.95rem; color:#555;">
+        <span style="display:block;"><em>Date:</em> 2nd-4th July</span>
+        <span style="display:block;"><em>Location:</em> Gaur Central Mall, RDC</span>
+      </div>
+    </div>
+    <!-- Event 2 -->
+    <div style="flex:1 1 250px; min-width:250px; max-width:320px; background:#f8fafc; border-radius:16px; box-shadow:0 2px 8px rgba(22,130,130,0.08); padding:1.2rem; display:flex; flex-direction:column; align-items:center;">
+      <img src="images/jagran night (1).jpg" alt="Live jagran Night" style="width:300px; height:150px; object-fit:cover; margin-bottom:1rem; border:3px solid #168282;">
+      <strong style="font-size:1.15rem; color:#168282; margin-bottom:0.5rem;">Sacred Jagran Night</strong>
+      <p style="text-align:center; color:#333; margin-bottom:0.5rem;">Local artisans performing live.</p>
+      <div style="font-size:0.95rem; color:#555;">
+        <span style="display:block;"><em>Date:</em> 3rd August, 10pm - 4th August 5am</span>
+        <span style="display:block;"><em>Location:</em> City Amphitheatre</span>
+      </div>
+    </div>
+    <!-- Event 3 -->
+    <div style="flex:1 1 250px; min-width:250px; max-width:320px; background:#f8fafc; border-radius:16px; box-shadow:0 2px 8px rgba(22,130,130,0.08); padding:1.2rem; display:flex; flex-direction:column; align-items:center;">
+      <img src="images/art (1).jpg" alt="Art & Craft Exhibition" style="width:300px; height:150px; object-fit:cover; margin-bottom:1rem; border:3px solid #168282;">
+      <strong style="font-size:1.15rem; color:#168282; margin-bottom:0.5rem;">Art & Craft Exhibition</strong>
+      <p style="text-align:center; color:#333; margin-bottom:0.5rem;">Discover unique handmade items.</p>
+      <div style="font-size:0.95rem; color:#555;">
+        <span style="display:block;"><em>Date:</em> Ongoing till 5th August</span>
+        <span style="display:block;"><em>Location:</em> Community Hall, Raj Nagar</span>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ...existing code... -->
+
+<footer style="background:#033543; color:#fff; text-align:center; padding:1rem 0; border-radius:16px 16px 0 0; margin-top:2rem; font-family:'Poppins',sans-serif; box-shadow:0 -2px 8px rgba(0,0,0,0.08);">
+  <div style="margin-bottom:0.5rem;">
+    <img src="images/Notify.png" alt="Notify Logo" style="width:36px; height:36px; border-radius:50%; vertical-align:middle; margin-right:0.5rem;">
+    <span style="font-weight:700; font-size:1.1rem;">Community Digital Notice Board</span>
+  </div>
+  <div style="font-size:0.95rem;">
+    &copy; 2025 Raj Nagar &mdash; All rights reserved.<br>
+    <span style="font-size:0.9rem; color:#b2bec3;">Made with ❤️ for the community</span>
+  </div>
+</footer>
+
+
+<script>
+  function logoutAdmin() {
+  localStorage.removeItem('adminLoggedIn');
+  localStorage.removeItem('adminName');
+  alert("Logged out successfully!");
+  location.reload();
+}
+
+function showSection(id) {
+  document.querySelectorAll('section').forEach(sec => {
+    sec.classList.remove('active');
+  });
+  document.getElementById(id).classList.add('active');
+}
+
+function openPostForm() {
+  document.getElementById('postForm').style.display = 'block';
+}
+
+function addPost(e) {
+   e.preventDefault();
+  const section = document.getElementById('section').value;
+  const title = document.getElementById('title').value;
+  const content = document.getElementById('content').value;
+
+  // Get existing posts from localStorage
+  let posts = JSON.parse(localStorage.getItem(section + 'Posts')) || [];
+
+  // Add new post
+  posts.unshift({ title, content });
+
+  // Save back to localStorage
+  localStorage.setItem(section + 'Posts', JSON.stringify(posts));
+
+  // Render posts
+  renderPosts(section);
+
+  document.getElementById('postForm').reset();
+  document.getElementById('postForm').style.display = 'none';
+}
+function renderPosts(section) {
+  const posts = JSON.parse(localStorage.getItem(section + 'Posts')) || [];
+  const container = document.getElementById(section + 'Posts');
+  container.innerHTML = '';
+  posts.forEach(post => {
+    const div = document.createElement('div');
+    div.className = 'post';
+    div.innerHTML = `
+      <strong class="post-title">${post.title}</strong>
+      <p class="post-content">${post.content}</p>
+      <div class="post-actions">
+        <button class="edit-btn" onclick="editPost(this)">Edit</button>
+        <button class="delete-btn" onclick="deletePost(this)">Delete</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+function editPost(btn) {
+  const postDiv = btn.closest('.post');
+  const titleElem = postDiv.querySelector('.post-title');
+  const contentElem = postDiv.querySelector('.post-content');
+  const actionsDiv = postDiv.querySelector('.post-actions');
+
+  
+  const currentTitle = titleElem.textContent;
+  const currentContent = contentElem.textContent;
+
+  
+  titleElem.outerHTML = `<input class="edit-title" type="text" value="${currentTitle}" style="width:95%;font-weight:bold;font-size:1.1em;">`;
+  contentElem.outerHTML = `<textarea class="edit-content" style="width:95%;margin-top:0.5em;">${currentContent}</textarea>`;
+
+  actionsDiv.innerHTML = `
+    <button class="save-btn" onclick="saveEdit(this)">Save</button>
+    <button class="cancel-btn" onclick="cancelEdit(this, '${currentTitle.replace(/'/g,"\\'")}', \`${currentContent.replace(/`/g,"\\`")}\`)">Cancel</button>
+  `;
+}
+
+function saveEdit(btn) {
+  const postDiv = btn.closest('.post');
+  const newTitle = postDiv.querySelector('.edit-title').value;
+  const newContent = postDiv.querySelector('.edit-content').value;
+  const actionsDiv = postDiv.querySelector('.post-actions');
+
+  postDiv.querySelector('.edit-title').outerHTML = `<strong class="post-title">${newTitle}</strong>`;
+  postDiv.querySelector('.edit-content').outerHTML = `<p class="post-content">${newContent}</p>`;
+
+  actionsDiv.innerHTML = `
+    <button class="edit-btn" onclick="editPost(this)">Edit</button>
+    <button class="delete-btn" onclick="deletePost(this)">Delete</button>
+  `;
+}
+
+function cancelEdit(btn, oldTitle, oldContent) {
+  const postDiv = btn.closest('.post');
+  postDiv.querySelector('.edit-title').outerHTML = `<strong class="post-title">${oldTitle}</strong>`;
+  postDiv.querySelector('.edit-content').outerHTML = `<p class="post-content">${oldContent}</p>`;
+  postDiv.querySelector('.post-actions').innerHTML = `
+    <button class="edit-btn" onclick="editPost(this)">Edit</button>
+    <button class="delete-btn" onclick="deletePost(this)">Delete</button>
+  `;
+}
+
+function deletePost(btn) {
+  if (confirm("Are you sure you want to delete this post?")) {
+    const postDiv = btn.closest('.post');
+    const section = postDiv.parentElement.id.replace('Posts', '');
+    const title = postDiv.querySelector('.post-title').textContent;
+    const content = postDiv.querySelector('.post-content').textContent;
+
+    let posts = JSON.parse(localStorage.getItem(section + 'Posts')) || [];
+    posts = posts.filter(post => !(post.title === title && post.content === content));
+    localStorage.setItem(section + 'Posts', JSON.stringify(posts));
+    renderPosts(section);
+}
+}
+
+function goToAdminLogin() {
+  window.location.href = "admin.html";
+}
+
+
+// Show/hide admin buttons based on login state
+window.onload = function() {
+  const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
+  const adminName = localStorage.getItem('adminName') || 'Admin';
+  const loginBtn = document.getElementById('adminLoginBtn');
+  const addPostBtn = document.getElementById('addPostBtn');
+  const logoutBtn = document.getElementById('logoutBtn'); 
+
+  if (isAdmin) {
+    loginBtn.style.display = 'none';
+    addPostBtn.style.display = 'inline-block';
+    addPostBtn.textContent = `+ New Post (${adminName})`;
+    logoutBtn.style.display = 'inline-block'; // Show logout button
+  } else {
+    loginBtn.style.display = 'inline-block';
+    addPostBtn.style.display = 'none';
+    logoutBtn.style.display = 'none'; // Hide logout button
+}
+renderPosts('announcements');
+renderPosts('events');
+renderPosts('market');
+}
+
+</script>
+
+</body>
+</html> 
